@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Milk™ Tycoon</title>
+  <link rel="icon" type="image/png" href="product1.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@600;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      background: #434c52 url("background.png") center / cover fixed no-repeat;
+      color: white;
+      font-family: Arial, sans-serif;
+      text-align: center;
+      margin: 0;
+    }
+
+    #auraframe {
+      width: 200px;
+      margin-top: 20px;
+      cursor: pointer;
+      transition: transform 0.1s;
+      -webkit-user-drag: none;
+      -moz-user-drag: none;
+      -ms-user-drag: none;
+      user-drag: none;
+      user-select: none;
+    }
+
+    #auraframe:hover {
+      transform: scale(1.05);
+    }
+
+    #auraframe:active {
+      transform: scale(0.95);
+    }
+
+    #stats { margin: 0; }
+
+#game-header {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  box-sizing: border-box;
+  min-height: 126px;
+  padding: 14px 20px;
+
+  background: rgba(17, 17, 17, 0.65);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+
+  border-bottom: 2px solid rgba(255, 255, 255, 0.8);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.45);
+}
+
+    .product-showcase {
+      position: absolute;
+      top: 14px;
+      left: 20px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      color: white;
+      text-decoration: none;
+      text-align: left;
+      font-family: "Fredoka", sans-serif;
+      font-size: 16px;
+      font-weight: 600;
+      transition: transform 0.2s ease, color 0.2s ease;
+    }
+
+    .product-showcase:hover {
+      color: rgb(69, 193, 255);
+      transform: scale(1.02);
+    }
+
+    .product-slideshow {
+      position: relative;
+      width: 190px;
+      height: 96px;
+      flex-shrink: 0;
+      overflow: hidden;
+    }
+
+    .product-slideshow img {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      opacity: 0;
+      animation: productFade 12s infinite;
+    }
+
+    .product-slideshow img:nth-child(2) { animation-delay: 4s; }
+    .product-slideshow img:nth-child(3) { animation-delay: 8s; }
+
+    @keyframes productFade {
+      0% { opacity: 0; }
+      8%, 27% { opacity: 1; }
+      35%, 100% { opacity: 0; }
+    }
+
+    #game-header h1 { margin: 0 0 10px; }
+
+    #audio-controls {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin: 0 20px 20px;
+    }
+
+    #audio-controls button {
+      padding: 7px 12px;
+      border: 1px solid white;
+      border-radius: 6px;
+      background: #222;
+      color: white;
+      cursor: pointer;
+    }
+
+    #audio-controls button.muted {
+      border-color: #888;
+      color: #bbb;
+    }
+
+    #resetButton {
+      position: absolute;
+      top: 14px;
+      right: 20px;
+      border-radius: 50px;
+      border-color: rgb(255, 0, 0) !important;
+      color: rgb(251, 6, 6) !important;
+    }
+
+    #resetDialog {
+      position: fixed;
+      inset: 0;
+      z-index: 20;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      background: rgba(0, 0, 0, 0.72);
+    }
+
+    #resetDialog.visible { display: flex; }
+
+    .dialog-content {
+      max-width: 360px;
+      padding: 24px;
+      border: 2px solid white;
+      border-radius: 12px;
+      background: #101010;
+    }
+
+    .dialog-actions { display: flex; justify-content: center; gap: 12px; margin-top: 18px; }
+    .dialog-actions button { padding: 8px 18px; border: none; border-radius: 6px; color: white; cursor: pointer; }
+    #confirmReset { background: #c9302c; }
+    #cancelReset { background: #555; }
+
+#shop {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 860px));
+  justify-content: center;
+  gap: 30px;
+  width: min(100%, 5080px);
+  margin: 15px auto;
+}
+
+@media (max-width: 600px) {
+  #shop {
+    grid-template-columns: 1fr;
+    width: calc(100% - 24px);
+    gap: 10px;
+    margin: 12px auto;
+  }
+
+  .upgrade {
+    padding: 10px;
+  }
+
+  #game-header {
+    min-height: 184px;
+    padding: 10px 12px 112px;
+  }
+
+  #game-header h1 {
+    font-size: 22px;
+  }
+
+  #stats {
+    font-size: 14px;
+  }
+
+  .product-showcase {
+    top: auto;
+    right: 12px;
+    bottom: 10px;
+    left: 12px;
+    justify-content: center;
+    gap: 10px;
+    font-size: 13px;
+  }
+
+  .product-slideshow {
+    width: 120px;
+    height: 68px;
+  }
+
+  #resetButton {
+    top: 10px;
+    right: 12px;
+  }
+}
+
+.upgrade {
+  padding: 7px;
+  background: rgba(0, 0, 0, 0.25);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 2px solid rgba(255, 255, 255, 0.8);
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.45);
+}
+
+    .upgrade h3 {
+      color: rgb(69, 193, 255);
+      -webkit-text-stroke: 1px rgb(208, 236, 237);
+
+      margin: 0;
+      font-size: 30px;
+      font-family: "Fredoka", sans-serif;
+      font-weight: 700;
+    }
+
+    .upgrade p {
+      color: rgb(255, 255, 255);
+      margin: 5px 0;
+      font-size: 12px;
+    }
+
+    .upgrade button {
+      margin-top: 5px;
+      padding: 5px 10px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      background: rgb(174, 177, 175);
+      color: white
+    }
+
+    .upgrade button.enabled {
+      color: rgb(254, 254, 255);
+      background: lime
+    }
+
+    .floating-text {
+      position: absolute;
+      color: lime;
+      font-weight: bold;
+      pointer-events: none;
+      animation: floatUp 1s ease-out forwards;
+    }
+
+    @keyframes floatUp {
+      0% { opacity: 1; transform: translateY(0); }
+      100% { opacity: 0; transform: translateY(-50px); }
+    }
+
+    #chad {
+      position: absolute;
+      width: 100px;
+      opacity: 0;
+      transition: opacity 1s;
+      cursor: pointer;
+      -webkit-user-drag: none;
+      -moz-user-drag: none;
+      -ms-user-drag: none;
+      user-drag: none;
+      user-select: none;
+    }
+
+    #company-footer {
+      margin-top: 32px;
+      padding: 22px 16px;
+      border-top: 2px solid rgba(255, 255, 255, 0.8);
+      background: rgba(17, 17, 17, 0.72);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      font-family: "Fredoka", sans-serif;
+    }
+
+    #company-footer a {
+      color: rgb(69, 193, 255);
+      font-weight: 700;
+      text-decoration: none;
+    }
+
+    #company-footer a:hover { text-decoration: underline; }
+  </style>
+</head>
+<body>
+  <div id="game-header">
+    <a class="product-showcase" href="exemple.html" aria-label="Découvrez nos nouveaux produits">
+      <span class="product-slideshow" aria-hidden="true">
+        <img src="product1.png" alt="">
+        <img src="product2.png" alt="">
+        <img src="product3.png" alt="">
+      </span>
+      <span> Discover our <br> new products !</span>
+    </a>
+    <h1>Milk™ Tycoon</h1>
+    <div id="stats">
+      <p id="auraCount"> Money: 0</p>
+      <p id="auraPerClick">Money per click: 1</p>
+      <p id="auraPerSecond">Money per second: 0</p>
+    </div>
+    <button id="resetButton" type="button">Reset</button>
+  </div>
+
+  <div id="audio-controls">
+    <button id="musicToggle" type="button">Music : enabled</button>
+    <button id="soundToggle" type="button">Sounds : enabled</button>
+  </div>
+
+  <img id="auraframe" src="product1.png" alt="Main brand logo">
+
+  <div id="shop"></div>
+
+  <img id="chad" src="marque.png" alt="Bonus">
+
+  
+  <audio id="backgroundMusic" src="music.mp3" loop autoplay></audio>
+
+  <div id="resetDialog" role="dialog" aria-modal="true" aria-labelledby="resetTitle">
+    <div class="dialog-content">
+      <h2 id="resetTitle">Are you sure you want to reset ?</h2>
+      <p>You'll lose all progression</p>
+      <div class="dialog-actions">
+        <button id="confirmReset" type="button">Yes</button>
+        <button id="cancelReset" type="button">No</button>
+      </div>
+    </div>
+  </div>
+
+  <footer id="company-footer">
+    Discover the brand on <a href="exemple.html">our website</a> <p> • </p> <p style="font-size: small;"> This website have been made by Cedoche (cedric.procontact@proton.me) </p>
+  </footer>
+
+  <script>
+    let aura = 0;
+    let auraPerClick = 1;
+    let auraPerSecond = 0;
+
+    const auraCountElem = document.getElementById("auraCount");
+    const auraPerClickElem = document.getElementById("auraPerClick");
+    const auraPerSecondElem = document.getElementById("auraPerSecond");
+    const auraframe = document.getElementById("auraframe");
+    const shop = document.getElementById("shop");
+    const chad = document.getElementById("chad");
+    const backgroundMusic = document.getElementById("backgroundMusic");
+    const musicToggle = document.getElementById("musicToggle");
+    const soundToggle = document.getElementById("soundToggle");
+    const resetButton = document.getElementById("resetButton");
+    const resetDialog = document.getElementById("resetDialog");
+    const confirmReset = document.getElementById("confirmReset");
+    const cancelReset = document.getElementById("cancelReset");
+    const clickSound = new Audio("click.mp3");
+    const MUSIC_VOLUME = 0.12;
+    let musicMuted = false;
+    let soundsMuted = false;
+    let audioContext;
+
+    const SAVE_KEY = "auraClickerProgress";
+    const upgrades = [
+      { name: "Cows", description: "Cows make milk", cost: 50, apc: 1, aps: 0, bought: 0 },
+      { name: "Farmers", description : "They're very important", cost: 200, apc: 2, aps: 1, bought: 0 },
+      { name: "Milk™ Factories", description : "It's literrally making milk", cost: 1000, apc: 5, aps: 5, bought: 0 },
+      { name: "Milk™ Fans", description : "You're one of them, right ?", cost: 5000, apc: 20, aps: 20, bought: 0 },
+      { name: "Super Cows", description : "How ?", cost: 15000, apc: 50, aps: 60, bought: 0 },
+      { name: "Milk™ Rivers", description : "Look ! Milk rivers !", cost: 30000, apc: 100, aps: 120, bought: 0 },
+      { name: "Milk™ Lakes", description : "You can swim in it", cost: 60000, apc: 250, aps: 250, bought: 0 },
+      { name: "Milk™ Seas", description : "The sand at the bottom is sugar", cost: 100000, apc: 400, aps: 500, bought: 0 },
+      { name: "Milk™ Ocean", description : "How do you add new oceans ??", cost: 250000, apc: 1000, aps: 1200, bought: 0 },
+      { name: "Chocolate Cows", description : "How ????", cost: 500000, apc: 2000, aps: 2500, bought: 0 },
+      { name: "Chocolate Milk™ Factories", description : "Our new Chocolate Milk™ is available", cost: 1000000, apc: 4000, aps: 6000, bought: 0 },
+      { name: "Chocolate Milk™ Rivers", description :"Those rivers are tasty", cost: 2000000, apc: 7000, aps: 8000, bought: 0 },
+      { name: "Our new Strawberry Milk™", description :"You can get them for cheap on our website", cost: 5000000, apc: 12000, aps: 15000, bought: 0 },
+      { name: "Our new Vanilla Milk™", description :"You can get them for cheap on our website", cost: 10000000, apc: 20000, aps: 25000, bought: 0 },
+      { name: "Vintage 1970's Milk™ bottles", description : "Remember those good days ?", cost: 20000000, apc: 40000, aps: 60000, bought: 0 },
+      { name: "Super Milk™ Factories", description : "They are so super they could go in space", cost: 50000000, apc: 80000, aps: 100000, bought: 0 },
+      { name: "Space Milk™ Factories", description : "There it is, they're in space now", cost: 100000000, apc: 200000, aps: 250000, bought: 0 },
+      { name: "Milk™ Rockets", description : "Using the power of milk to refuel de ships", cost: 500000000, apc: 500000, aps: 600000, bought: 0 },
+      { name: "Saving the planet with Ethical Milk™ (max 1)", description : "Everything's calm now", cost: 1000000000, apc: 1000000, aps: 2000000, bought: 0, maxPurchases: 1 }
+    ].map(upgrade => ({
+      ...upgrade,
+      baseCost: upgrade.cost
+    }));
+
+    function formatNumber(value) {
+      const suffixes = ["", "K", "M", "B", "T", "Qa", "Qi", "Sx", "Sp", "Oc", "No", "Dc"];
+      const number = Math.floor(value);
+      if (number < 1000) return String(number);
+
+      const group = Math.min(Math.floor(Math.log10(number) / 3), suffixes.length - 1);
+      const scaled = number / Math.pow(1000, group);
+      const decimals = scaled < 10 ? 2 : scaled < 100 ? 1 : 0;
+      return `${scaled.toFixed(decimals).replace(/\.0+$/, "").replace(/(\.\d*?)0+$/, "$1")}${suffixes[group]}`;
+    }
+
+    function saveProgress() {
+      try {
+        localStorage.setItem(SAVE_KEY, JSON.stringify({
+          aura,
+          auraPerClick,
+          auraPerSecond,
+          upgrades: upgrades.map(({ cost, bought }) => ({ cost, bought }))
+        }));
+      } catch {
+        // La partie continue même si le navigateur interdit le stockage local.
+      }
+    }
+
+    function loadProgress() {
+      try {
+        const saved = JSON.parse(localStorage.getItem(SAVE_KEY));
+        if (!saved) return;
+        if (Number.isFinite(saved.aura)) aura = saved.aura;
+        if (Number.isFinite(saved.auraPerClick)) auraPerClick = saved.auraPerClick;
+        if (Number.isFinite(saved.auraPerSecond)) auraPerSecond = saved.auraPerSecond;
+        saved.upgrades?.forEach((savedUpgrade, i) => {
+          if (!upgrades[i]) return;
+          if (Number.isFinite(savedUpgrade.cost)) upgrades[i].cost = savedUpgrade.cost;
+          if (Number.isInteger(savedUpgrade.bought)) upgrades[i].bought = savedUpgrade.bought;
+        });
+      } catch {
+        localStorage.removeItem(SAVE_KEY);
+      }
+    }
+
+    function resetGame() {
+      aura = 0;
+      auraPerClick = 1;
+      auraPerSecond = 0;
+      upgrades.forEach(upgrade => {
+        upgrade.cost = upgrade.baseCost;
+        upgrade.bought = 0;
+      });
+      resetDialog.classList.remove("visible");
+      updateStats();
+    }
+
+    upgrades.forEach((u, i) => {
+      const div = document.createElement("div");
+      div.className = "upgrade";
+      div.innerHTML = `
+        <h3>${u.name} <span id="count-${i}">x0</span></h3>
+        <p>  ${u.description}</p>
+        <p id="cost-${i}">Cost : ${formatNumber(u.cost)}</p>
+        <button id="buy-${i}" disabled>Buy</button>
+      `;
+      shop.appendChild(div);
+    });
+
+    function playSound(frequency, duration, type = "sine") {
+      if (soundsMuted) return;
+      audioContext ??= new (window.AudioContext || window.webkitAudioContext)();
+      const oscillator = audioContext.createOscillator();
+      const gain = audioContext.createGain();
+      oscillator.type = type;
+      oscillator.frequency.value = frequency;
+      gain.gain.setValueAtTime(0.12, audioContext.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + duration);
+      oscillator.connect(gain).connect(audioContext.destination);
+      oscillator.start();
+      oscillator.stop(audioContext.currentTime + duration);
+    }
+
+    function playClickSound() {
+      if (soundsMuted) return;
+      const sound = clickSound.cloneNode();
+      sound.play().catch(() => {});
+    }
+
+    function startMusic() {
+      if (!musicMuted) backgroundMusic.play().catch(() => {});
+    }
+
+    backgroundMusic.volume = MUSIC_VOLUME;
+    startMusic();
+    document.addEventListener("pointerdown", startMusic, { once: true });
+
+    musicToggle.addEventListener("click", () => {
+      musicMuted = !musicMuted;
+      backgroundMusic.muted = musicMuted;
+      musicToggle.textContent = `Musique : ${musicMuted ? "coupée" : "activée"}`;
+      musicToggle.classList.toggle("muted", musicMuted);
+      if (!musicMuted) startMusic();
+    });
+
+    soundToggle.addEventListener("click", () => {
+      soundsMuted = !soundsMuted;
+      soundToggle.textContent = `Sons : ${soundsMuted ? "coupés" : "activés"}`;
+      soundToggle.classList.toggle("muted", soundsMuted);
+    });
+
+    resetButton.addEventListener("click", () => resetDialog.classList.add("visible"));
+    cancelReset.addEventListener("click", () => resetDialog.classList.remove("visible"));
+    confirmReset.addEventListener("click", resetGame);
+
+    document.addEventListener("keydown", (event) => {
+      if (event.key.toLowerCase() === "c" && !event.ctrlKey && !event.metaKey && !event.altKey) {
+        aura += 10000000000000000000000000000000000000000000000000000;
+        updateStats();
+        spawnFloatingText(window.innerWidth / 2, window.scrollY + 80, "WHAT ?");
+      }
+    });
+
+    function updateStats() {
+      auraCountElem.textContent = `Money : ${formatNumber(aura)}`;
+      auraPerClickElem.textContent = `Money per click : ${formatNumber(auraPerClick)}`;
+      auraPerSecondElem.textContent = `Money per second : ${formatNumber(auraPerSecond)}`;
+
+      upgrades.forEach((u, i) => {
+        const btn = document.getElementById(`buy-${i}`);
+        document.getElementById(`count-${i}`).textContent = `x${u.bought}`;
+        document.getElementById(`cost-${i}`).textContent = `Cost : ${formatNumber(u.cost)}`;
+        const limitReached = u.maxPurchases !== undefined && u.bought >= u.maxPurchases;
+        if (limitReached) {
+          btn.classList.remove("enabled");
+          btn.disabled = true;
+          btn.textContent = "Maximum atteint";
+        } else if (aura >= u.cost) {
+          btn.classList.add("enabled");
+          btn.disabled = false;
+          btn.textContent = "Buy";
+        } else {
+          btn.classList.remove("enabled");
+          btn.disabled = true;
+          btn.textContent = "Buy";
+        }
+      });
+      saveProgress();
+    }
+
+    auraframe.addEventListener("click", (e) => {
+      aura += auraPerClick;
+      updateStats();
+      spawnFloatingText(e.pageX, e.pageY, `+${formatNumber(auraPerClick)}`);
+      playClickSound();
+    });
+
+    upgrades.forEach((u, i) => {
+      document.getElementById(`buy-${i}`).addEventListener("click", () => {
+        if (aura >= u.cost && (u.maxPurchases === undefined || u.bought < u.maxPurchases)) {
+          aura -= u.cost;
+          auraPerClick += u.apc;
+          auraPerSecond += u.aps;
+          u.bought++;
+          u.cost = Math.floor(u.cost * 1.3);
+          document.getElementById(`count-${i}`).textContent = `x${u.bought}`;
+          document.getElementById(`cost-${i}`).textContent = `Cost : ${formatNumber(u.cost)}`;
+          playClickSound();
+          updateStats();
+        }
+      });
+    });
+
+    function spawnFloatingText(x, y, text) {
+      const div = document.createElement("div");
+      div.className = "floating-text";
+      div.style.left = x + "px";
+      div.style.top = y + "px";
+      div.textContent = text;
+      document.body.appendChild(div);
+      setTimeout(() => div.remove(), 1000);
+    }
+
+    setInterval(() => {
+      aura += auraPerSecond;
+      updateStats();
+    }, 1000);
+
+    function trySpawnChad() {
+      if (Math.random() < 0.002) {
+        const x = Math.random() * (window.innerWidth - 100);
+        const y = Math.random() * (window.innerHeight - 100);
+        chad.style.left = x + "px";
+        chad.style.top = y + "px";
+        chad.style.opacity = 1;
+        chad.style.pointerEvents = "auto";
+
+        const removeTimeout = setTimeout(() => {
+          chad.style.opacity = 0;
+          setTimeout(() => chad.style.pointerEvents = "none", 200);
+        }, 10000);
+
+        chad.onclick = (e) => {
+        chad.style.opacity = 0;
+        chad.style.pointerEvents = "none";
+          aura += auraPerClick * 50;
+          updateStats();
+          spawnFloatingText(e.pageX, e.pageY, `+${formatNumber(auraPerClick * 50)}`);
+          playSound(180, 0.3, "sawtooth");
+          clearTimeout(removeTimeout);
+        };
+      };
+    };
+
+    setInterval(trySpawnChad, 300);
+
+    loadProgress();
+    updateStats();
+  </script>
+</body>
+</html>
