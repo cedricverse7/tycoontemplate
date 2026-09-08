@@ -9,309 +9,221 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@600;700&display=swap" rel="stylesheet">
   <style>
+
+    /* THEME — change these colors to reuse the template for another brand. */
+    :root {
+      --accent: #8bdeff;
+      --panel: rgba(13, 27, 38, .92);
+      --border: rgba(177, 220, 242, .22);
+      --muted: #a4b9c8;
+      --shop-width: 390px;
+    }
+
+    * { box-sizing: border-box; }
     body {
-      background: #434c52 url("background.png") center / cover fixed no-repeat;
-      color: white;
-      font-family: Arial, sans-serif;
-      text-align: center;
       margin: 0;
+      color: #f4faff;
+      background: #172d3e url("background.png") center / cover fixed no-repeat;
+      font-family: Arial, sans-serif;
+    }
+    button, a { -webkit-tap-highlight-color: transparent; }
+    button { font: inherit; cursor: pointer; }
+    button:focus-visible, a:focus-visible {
+      outline: 3px solid var(--accent);
+      outline-offset: 4px;
     }
 
-    #auraframe {
-      width: 200px;
-      margin-top: 20px;
-      cursor: pointer;
-      transition: transform 0.1s;
-      -webkit-user-drag: none;
-      -moz-user-drag: none;
-      -ms-user-drag: none;
-      user-drag: none;
-      user-select: none;
+    /* DESKTOP — the left panel stays visible while the store scrolls. */
+    .game-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) var(--shop-width);
+      height: 100vh;
+      height: 100dvh;
     }
-
-    #auraframe:hover {
-      transform: scale(1.05);
-    }
-
-    #auraframe:active {
-      transform: scale(0.95);
-    }
-
-    #stats { margin: 0; }
-
-#game-header {
-  position: sticky;
-  top: 0;
-  z-index: 10;
-  box-sizing: border-box;
-  min-height: 126px;
-  padding: 14px 20px;
-
-  background: rgba(17, 17, 17, 0.65);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-
-  border-bottom: 2px solid rgba(255, 255, 255, 0.8);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.45);
-}
-
-    .product-showcase {
-      position: absolute;
-      top: 14px;
-      left: 20px;
+    .clicker-panel {
+      min-width: 0;
+      overflow-y: auto;
       display: flex;
-      align-items: center;
-      gap: 14px;
-      color: white;
-      text-decoration: none;
-      text-align: left;
-      font-family: "Fredoka", sans-serif;
-      font-size: 16px;
-      font-weight: 600;
-      transition: transform 0.2s ease, color 0.2s ease;
+      flex-direction: column;
+      text-align: center;
+      background: linear-gradient(180deg, rgba(9, 24, 37, .7), rgba(9, 24, 37, .3));
     }
-
-    .product-showcase:hover {
-      color: rgb(69, 193, 255);
-      transform: scale(1.02);
-    }
-
-    .product-slideshow {
+    #game-header {
       position: relative;
-      width: 190px;
-      height: 96px;
-      flex-shrink: 0;
-      overflow: hidden;
+      padding: 26px 24px 18px;
+      border-bottom: 1px solid var(--border);
+      background: rgba(8, 22, 33, .55);
     }
-
-    .product-slideshow img {
-      position: absolute;
-      inset: 0;
-      width: 100%;
-      height: 100%;
-      object-fit: contain;
-      opacity: 0;
-      animation: productFade 12s infinite;
+    #game-header h1 {
+      margin: 0 60px 18px;
+      font: 700 clamp(24px, 3vw, 42px) "Fredoka", sans-serif;
     }
-
-    .product-slideshow img:nth-child(2) { animation-delay: 4s; }
-    .product-slideshow img:nth-child(3) { animation-delay: 8s; }
-
-    @keyframes productFade {
-      0% { opacity: 0; }
-      8%, 27% { opacity: 1; }
-      35%, 100% { opacity: 0; }
+    #stats p { margin: 7px 0; }
+    #auraCount {
+      font: 700 clamp(26px, 3.5vw, 48px) "Fredoka", sans-serif;
+      color: var(--accent);
     }
-
-    #game-header h1 { margin: 0 0 10px; }
-
-    #audio-controls {
-      display: flex;
-      justify-content: center;
-      gap: 10px;
-      margin: 0 20px 20px;
-    }
-
-    #audio-controls button {
-      padding: 7px 12px;
-      border: 1px solid white;
-      border-radius: 6px;
-      background: #222;
-      color: white;
-      cursor: pointer;
-    }
-
-    #audio-controls button.muted {
-      border-color: #888;
-      color: #bbb;
-    }
-
+    #auraPerClick, #auraPerSecond { color: #d0dfe9; font-size: 14px; }
     #resetButton {
       position: absolute;
-      top: 14px;
-      right: 20px;
-      border-radius: 50px;
-      border-color: rgb(255, 0, 0) !important;
-      color: rgb(251, 6, 6) !important;
-    }
-
-    #resetDialog {
-      position: fixed;
-      inset: 0;
-      z-index: 20;
-      display: none;
-      align-items: center;
-      justify-content: center;
-      padding: 20px;
-      background: rgba(0, 0, 0, 0.72);
-    }
-
-    #resetDialog.visible { display: flex; }
-
-    .dialog-content {
-      max-width: 360px;
-      padding: 24px;
-      border: 2px solid white;
-      border-radius: 12px;
-      background: #101010;
-    }
-
-    .dialog-actions { display: flex; justify-content: center; gap: 12px; margin-top: 18px; }
-    .dialog-actions button { padding: 8px 18px; border: none; border-radius: 6px; color: white; cursor: pointer; }
-    #confirmReset { background: #c9302c; }
-    #cancelReset { background: #555; }
-
-#shop {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 860px));
-  justify-content: center;
-  gap: 30px;
-  width: min(100%, 5080px);
-  margin: 15px auto;
-}
-
-@media (max-width: 600px) {
-  #shop {
-    grid-template-columns: 1fr;
-    width: calc(100% - 24px);
-    gap: 10px;
-    margin: 12px auto;
-  }
-
-  .upgrade {
-    padding: 10px;
-  }
-
-  #game-header {
-    min-height: 184px;
-    padding: 10px 12px 112px;
-  }
-
-  #game-header h1 {
-    font-size: 22px;
-  }
-
-  #stats {
-    font-size: 14px;
-  }
-
-  .product-showcase {
-    top: auto;
-    right: 12px;
-    bottom: 10px;
-    left: 12px;
-    justify-content: center;
-    gap: 10px;
-    font-size: 13px;
-  }
-
-  .product-slideshow {
-    width: 120px;
-    height: 68px;
-  }
-
-  #resetButton {
-    top: 10px;
-    right: 12px;
-  }
-}
-
-.upgrade {
-  padding: 7px;
-  background: rgba(0, 0, 0, 0.25);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 2px solid rgba(255, 255, 255, 0.8);
-  border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.45);
-}
-
-    .upgrade h3 {
-      color: rgb(69, 193, 255);
-      -webkit-text-stroke: 1px rgb(208, 236, 237);
-
-      margin: 0;
-      font-size: 30px;
-      font-family: "Fredoka", sans-serif;
-      font-weight: 700;
-    }
-
-    .upgrade p {
-      color: rgb(255, 255, 255);
-      margin: 5px 0;
+      top: 20px;
+      right: 16px;
+      padding: 7px 10px;
+      border: 1px solid #ba7272;
+      border-radius: 8px;
+      color: #ffb0b0;
+      background: transparent;
       font-size: 12px;
     }
+    .click-stage {
+      flex: 1;
+      min-height: 300px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 28px;
+      background: radial-gradient(ellipse at center, rgba(116, 201, 255, .24), transparent 65%);
+    }
+    #auraframe {
+      display: block;
+      width: min(75%, 350px);
+      height: clamp(200px, 34vh, 360px);
+      padding: 0;
+      border: 0;
+      background: transparent;
+      transition: transform .12s;
+      filter: drop-shadow(0 18px 22px rgba(0, 0, 0, .4));
+      user-select: none;
+      touch-action: manipulation;
+    }
+    #auraframe img { width: 100%; height: 100%; object-fit: contain; -webkit-user-drag: none; }
+    #auraframe:hover { transform: scale(1.04); }
+    #auraframe:active { transform: scale(.94); }
+    .click-hint { color: #d0dfe9; font-size: 13px; letter-spacing: .08em; }
+    #audio-controls { display: flex; justify-content: center; flex-wrap: wrap; gap: 8px; padding: 12px; }
+    #audio-controls button {
+      padding: 9px 13px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: rgba(8, 22, 33, .65);
+      color: #e1edf5;
+      font-size: 12px;
+    }
+    #audio-controls button.muted { color: var(--muted); }
 
+    /* BRAND LINKS — keep the same image names when duplicating the game. */
+    .product-showcase {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      padding: 12px;
+      color: white;
+      text-decoration: none;
+      font: 600 15px "Fredoka", sans-serif;
+      text-align: left;
+      border-top: 1px solid var(--border);
+      background: rgba(8, 22, 33, .45);
+    }
+    .product-showcase:hover { color: var(--accent); }
+    .product-slideshow { position: relative; width: 100px; height: 65px; flex-shrink: 0; }
+    .product-slideshow img {
+      position: absolute; inset: 0;
+      width: 100%; height: 100%; object-fit: contain;
+      opacity: 0; animation: productFade 12s infinite;
+    }
+    .product-slideshow img:nth-child(2) { animation-delay: 4s; }
+    .product-slideshow img:nth-child(3) { animation-delay: 8s; }
+    @keyframes productFade {
+      0%, 35%, 100% { opacity: 0; }
+      8%, 27% { opacity: 1; }
+    }
+    #company-footer { padding: 12px; background: rgba(8, 22, 33, .65); color: var(--muted); font-size: 12px; }
+    #company-footer p { margin: 6px 0 0; }
+    #company-footer a { color: var(--accent); }
+
+    /* STORE — exactly one column, regardless of the number of upgrades. */
+    .store-panel {
+      min-width: 0;
+      overflow-y: auto;
+      background: var(--panel);
+      border-left: 3px solid var(--border);
+      scrollbar-color: #55758a #102330;
+    }
+    .store-heading {
+      position: sticky; top: 0; z-index: 2;
+      padding: 22px;
+      border-bottom: 1px solid var(--border);
+      background: #102330;
+    }
+    .store-heading h2 { margin: 0 0 6px; font: 700 28px "Fredoka", sans-serif; }
+    .store-heading p { margin: 0; color: var(--muted); font-size: 13px; }
+    #shop { display: grid; grid-template-columns: minmax(0, 1fr); gap: 10px; padding: 14px; }
+    .upgrade {
+      padding: 16px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: linear-gradient(135deg, #243f51, #192e3e);
+    }
+    .upgrade h3 { margin: 0 0 8px; font: 600 20px "Fredoka", sans-serif; overflow-wrap: anywhere; }
+    .upgrade h3 span { color: var(--accent); font-size: 16px; white-space: nowrap; }
+    .upgrade p { margin: 6px 0; color: var(--muted); font-size: 12px; line-height: 1.5; }
+    .upgrade .upgrade-cost { color: #f4faff; font-weight: bold; font-size: 14px; }
+    /* Only the price number is gray when the balance is insufficient. */
+    .upgrade .unaffordable { color: #91a5b4; }
+    .upgrade .upgrade-gains { color: var(--accent); font-weight: 600; }
     .upgrade button {
-      margin-top: 5px;
-      padding: 5px 10px;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-      background: rgb(174, 177, 175);
-      color: white
+      width: 100%; margin-top: 8px; padding: 10px;
+      border: 1px solid var(--border); border-radius: 6px;
+      background: #304655; color: #91a5b4;
     }
+    .upgrade button:disabled { cursor: not-allowed; }
+    .upgrade button.enabled { background: var(--accent); color: #102330; font-weight: bold; }
+    .upgrade button.enabled:hover { background: #b9edff; }
 
-    .upgrade button.enabled {
-      color: rgb(254, 254, 255);
-      background: lime
-    }
-
+    /* OVERLAYS — visible above both panels. */
     .floating-text {
-      position: absolute;
-      color: lime;
-      font-weight: bold;
-      pointer-events: none;
+      position: absolute; z-index: 30;
+      color: #b7ffcb; font-weight: bold; pointer-events: none;
       animation: floatUp 1s ease-out forwards;
     }
-
     @keyframes floatUp {
-      0% { opacity: 1; transform: translateY(0); }
-      100% { opacity: 0; transform: translateY(-50px); }
+      from { opacity: 1; transform: translate(-50%, 0); }
+      to { opacity: 0; transform: translate(-50%, -60px); }
     }
+    #chad { position: fixed; z-index: 10; width: 100px; opacity: 0; pointer-events: none; transition: opacity 1s; cursor: pointer; -webkit-user-drag: none; }
+    #resetDialog { position: fixed; inset: 0; z-index: 40; display: none; align-items: center; justify-content: center; padding: 20px; background: rgba(0, 0, 0, .75); }
+    #resetDialog.visible { display: flex; }
+    .dialog-content { max-width: 380px; padding: 28px; border: 1px solid var(--border); border-radius: 14px; background: #102330; text-align: center; }
+    .dialog-actions { display: flex; justify-content: center; gap: 12px; margin-top: 20px; }
+    .dialog-actions button { padding: 10px 22px; border: 0; border-radius: 6px; color: white; }
+    #confirmReset { background: #b33b43; }
+    #cancelReset { background: #405b70; }
 
-    #chad {
-      position: absolute;
-      width: 100px;
-      opacity: 0;
-      transition: opacity 1s;
-      cursor: pointer;
-      -webkit-user-drag: none;
-      -moz-user-drag: none;
-      -ms-user-drag: none;
-      user-drag: none;
-      user-select: none;
+    /* MOBILE — click area first, followed by the same single-column store. */
+    @media (max-width: 700px) {
+      .game-layout { height: auto; grid-template-columns: minmax(0, 1fr); }
+      .clicker-panel, .store-panel { overflow: visible; }
+      .store-panel { border-left: 0; border-top: 3px solid var(--border); }
+      .click-stage { min-height: 270px; padding: 20px; }
+      #auraframe { height: 220px; width: 250px; max-width: 90%; }
+      #game-header { padding: 22px 12px 16px; }
+      .store-heading { position: static; }
     }
-
-    #company-footer {
-      margin-top: 32px;
-      padding: 22px 16px;
-      border-top: 2px solid rgba(255, 255, 255, 0.8);
-      background: rgba(17, 17, 17, 0.72);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      font-family: "Fredoka", sans-serif;
+    @media (prefers-reduced-motion: reduce) {
+      #auraframe { transition: none; }
+      .product-slideshow img { animation: none; }
+      .product-slideshow img:first-child { opacity: 1; }
     }
-
-    #company-footer a {
-      color: rgb(69, 193, 255);
-      font-weight: 700;
-      text-decoration: none;
-    }
-
-    #company-footer a:hover { text-decoration: underline; }
   </style>
 </head>
 <body>
+  <!-- Main layout: clicking on the left, upgrades on the right. -->
+  <main class="game-layout">
+  <section class="clicker-panel" aria-label="Production">
   <div id="game-header">
-    <a class="product-showcase" href="exemple.html" aria-label="Découvrez nos nouveaux produits">
-      <span class="product-slideshow" aria-hidden="true">
-        <img src="product1.png" alt="">
-        <img src="product2.png" alt="">
-        <img src="product3.png" alt="">
-      </span>
-      <span> Discover our <br> new products !</span>
-    </a>
+
     <h1>Milk™ Tycoon</h1>
     <div id="stats">
       <p id="auraCount"> Money: 0</p>
@@ -321,14 +233,39 @@
     <button id="resetButton" type="button">Reset</button>
   </div>
 
+  <div class="click-stage">
+    <button id="auraframe" type="button" aria-label="Click to earn money">
+      <img src="product1.png" alt="Milk product" draggable="false">
+    </button>
+    <p class="click-hint">CLICK TO GROW YOUR EMPIRE</p>
+  </div>
   <div id="audio-controls">
     <button id="musicToggle" type="button">Music : enabled</button>
     <button id="soundToggle" type="button">Sounds : enabled</button>
   </div>
+    <a class="product-showcase" href="exemple.html" aria-label="Découvrez nos nouveaux produits">
+      <span class="product-slideshow" aria-hidden="true">
+        <img src="product1.png" alt="">
+        <img src="product2.png" alt="">
+        <img src="product3.png" alt="">
+      </span>
+      <span> Discover our <br> new products !</span>
+    </a>
+  <footer id="company-footer">
+    Discover the brand on <a href="exemple.html">our website</a> <p> • </p> <p> This website was made by <a href="mailto:cedric.proconctact@protonmail.me">
+  cedric.proconctact@protonmail.me
+</a> </p>
+  </footer>
+  </section>
 
-  <img id="auraframe" src="product1.png" alt="Main brand logo">
-
-  <div id="shop"></div>
+  <aside class="store-panel" aria-labelledby="store-title">
+    <header class="store-heading">
+      <h2 id="store-title">Store</h2>
+      <p></p>
+    </header>
+    <div id="shop"></div>
+  </aside>
+  </main>
 
   <img id="chad" src="marque.png" alt="Bonus">
 
@@ -346,9 +283,7 @@
     </div>
   </div>
 
-  <footer id="company-footer">
-    Discover the brand on <a href="exemple.html">our website</a> <p> • </p> <p style="font-size: small;"> This website have been made by Cedoche (cedric.procontact@proton.me) </p>
-  </footer>
+
 
   <script>
     let aura = 0;
@@ -393,7 +328,7 @@
       { name: "Vintage 1970's Milk™ bottles", description : "Remember those good days ?", cost: 20000000, apc: 40000, aps: 60000, bought: 0 },
       { name: "Super Milk™ Factories", description : "They are so super they could go in space", cost: 50000000, apc: 80000, aps: 100000, bought: 0 },
       { name: "Space Milk™ Factories", description : "There it is, they're in space now", cost: 100000000, apc: 200000, aps: 250000, bought: 0 },
-      { name: "Milk™ Rockets", description : "Using the power of milk to refuel de ships", cost: 500000000, apc: 500000, aps: 600000, bought: 0 },
+      { name: "Milk™ Rockets", description : "Using the power of milk to refuel the ships", cost: 500000000, apc: 500000, aps: 600000, bought: 0 },
       { name: "Saving the planet with Ethical Milk™ (max 1)", description : "Everything's calm now", cost: 1000000000, apc: 1000000, aps: 2000000, bought: 0, maxPurchases: 1 }
     ].map(upgrade => ({
       ...upgrade,
@@ -459,7 +394,11 @@
       div.innerHTML = `
         <h3>${u.name} <span id="count-${i}">x0</span></h3>
         <p>  ${u.description}</p>
-        <p id="cost-${i}">Cost : ${formatNumber(u.cost)}</p>
+        <p class="upgrade-gains">${[
+          u.apc > 0 ? `+${formatNumber(u.apc)} Money per click` : "",
+          u.aps > 0 ? `+${formatNumber(u.aps)} Money per second` : ""
+        ].filter(Boolean).join("<br>")}</p>
+        <p class="upgrade-cost">Cost : <span id="cost-${i}">${formatNumber(u.cost)}</span></p>
         <button id="buy-${i}" disabled>Buy</button>
       `;
       shop.appendChild(div);
@@ -513,7 +452,7 @@
 
     document.addEventListener("keydown", (event) => {
       if (event.key.toLowerCase() === "c" && !event.ctrlKey && !event.metaKey && !event.altKey) {
-        aura += 10000000000000000000000000000000000000000000000000000;
+        aura += 1;
         updateStats();
         spawnFloatingText(window.innerWidth / 2, window.scrollY + 80, "WHAT ?");
       }
@@ -527,12 +466,13 @@
       upgrades.forEach((u, i) => {
         const btn = document.getElementById(`buy-${i}`);
         document.getElementById(`count-${i}`).textContent = `x${u.bought}`;
-        document.getElementById(`cost-${i}`).textContent = `Cost : ${formatNumber(u.cost)}`;
+        document.getElementById(`cost-${i}`).textContent = formatNumber(u.cost);
+        document.getElementById(`cost-${i}`).classList.toggle("unaffordable", aura < u.cost);
         const limitReached = u.maxPurchases !== undefined && u.bought >= u.maxPurchases;
         if (limitReached) {
           btn.classList.remove("enabled");
           btn.disabled = true;
-          btn.textContent = "Maximum atteint";
+          btn.textContent = "Maximum reached";
         } else if (aura >= u.cost) {
           btn.classList.add("enabled");
           btn.disabled = false;
@@ -549,7 +489,7 @@
     auraframe.addEventListener("click", (e) => {
       aura += auraPerClick;
       updateStats();
-      spawnFloatingText(e.pageX, e.pageY, `+${formatNumber(auraPerClick)}`);
+      spawnFloatingText(e.pageX || (auraframe.getBoundingClientRect().left + auraframe.clientWidth / 2), e.pageY || (auraframe.getBoundingClientRect().top + window.scrollY + auraframe.clientHeight / 2), `+${formatNumber(auraPerClick)}`);
       playClickSound();
     });
 
@@ -562,7 +502,7 @@
           u.bought++;
           u.cost = Math.floor(u.cost * 1.3);
           document.getElementById(`count-${i}`).textContent = `x${u.bought}`;
-          document.getElementById(`cost-${i}`).textContent = `Cost : ${formatNumber(u.cost)}`;
+          document.getElementById(`cost-${i}`).textContent = formatNumber(u.cost);
           playClickSound();
           updateStats();
         }
